@@ -17,4 +17,3 @@ Things you may want to cover:
 ## Database initialization
 
 ## Deployment instructions
-# dislike-everywhere
