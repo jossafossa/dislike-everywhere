@@ -47,18 +47,29 @@ class Rating extends \Leaf\Model {
 
     // check if user has already rated
     $user_ratings = self::get_rating_list($url, $user);
-    if (count($user_ratings) > 0) {
+    $user_rating = $user_ratings[0] ?? null;
+    if ($user_rating) {
+      // check if rating is the same
+      if ($user_rating['rating'] == $rating) {
+        return [
+          'status' => 'no_change',
+          'message' => 'Rating unchanged'
+        ];
+      }
+
       // update rating
       db()->update('ratings')->params(['rating' => $rating])->where('url', $url)->where('user', $user)->execute();
       return [
-        'error' => 'You have already rated this'
+        'status' => 'updated',
+        'message' => 'Rating updated'
       ];
     }
 
     // check if rating is valid
     if (in_array($rating, [self::LIKE, self::DISLIKE]) === false) {
       return [
-        'error' => 'Invalid rating'
+        'message' => 'Invalid rating',
+        'status' => 'error'
       ];
     }
 
@@ -71,7 +82,8 @@ class Rating extends \Leaf\Model {
 
     // return success message
     return [
-      'message' => 'Rating successful'
+      'message' => 'Rating successful',
+      'status' => 'success'
     ];
   }
 
@@ -87,18 +99,20 @@ class Rating extends \Leaf\Model {
     // get ratings
     $ratings = db()->query("SELECT rating, COUNT(rating) as count FROM ratings WHERE url = ? GROUP BY rating")->bind($url)->all();
 
-
-
     $result = [
       'likes' => 0,
-      'dislikes' => 0
+      'dislikes' => 0,
+      'url' => $url,
     ];
 
     foreach ($ratings as $obj) {
-      $rating = $obj['rating'];
+      $rating = (int)$obj['rating'];
       $count = $obj['count'];
+
+      $key = null;
       if ($rating == self::LIKE) $key = 'likes';
       if ($rating == self::DISLIKE) $key = 'dislikes';
+      if ($key === null) continue;
       $result[$key] = $count;
     }
 

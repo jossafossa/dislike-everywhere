@@ -22,9 +22,7 @@ app()->get('/rate', function () {
 
 app()->get('/rating', function () {
   $url = request()->get('url');
-  $rating = Rating::get_ratings($url);
+  $rating = Rating::get_rating($url);
 
-  response()->json([
-    'ratings' => $rating
-  ]);
+  response()->json($rating);
 });
