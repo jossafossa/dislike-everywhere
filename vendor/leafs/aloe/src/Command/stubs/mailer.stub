@@ -1,0 +1,23 @@
+<?php
+
+namespace App\Mailers;
+
+use Leaf\Mail;
+
+class ClassName
+{
+    public static function action($user)
+    {
+        return new Mail([
+            'subject' => 'ClassName Test',
+            'body' => 'This is a test mail from action',
+            'recipientEmail' => $user->email,
+            'recipientName' => $user->name,
+
+            // these have been set as defaults in .env file
+            // you can override them here, otherwise, just remove them
+            'senderName' => _env('MAIL_SENDER_NAME'),
+            'senderEmail' => _env('MAIL_SENDER_EMAIL'),
+        ]);
+    }
+}
